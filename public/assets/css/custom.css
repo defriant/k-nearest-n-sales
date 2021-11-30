@@ -1,3 +1,11 @@
+.login-logo {
+    width: 200px;
+}
+
+.brand {
+    width: 175px;
+}
+
 .login-failed-message {
     color: rgb(255, 0, 0);
     font-size: 1.3rem;

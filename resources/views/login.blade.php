@@ -32,7 +32,7 @@
 					<div class="left">
 						<div class="content">
 							<div class="header">
-								<div class="logo text-center"><img src="{{ asset('assets/img/logo-dark.png') }}" class="login-logo"></div>
+								<div class="logo text-center"><img src="{{ asset('assets/img/logo.jpeg') }}" class="login-logo"></div>
 								<p class="lead">Login Admin</p>
 							</div>
 							<form class="form-auth-small" method="POST" action="/login-attempt">

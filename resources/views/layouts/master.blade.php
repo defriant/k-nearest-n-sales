@@ -36,7 +36,7 @@
     <div id="wrapper">
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="brand">
-                <a href="index.html"><img src="{{ asset('assets/img/logo-dark.png') }}" class="img-responsive logo"></a>
+                <a href="/"><img src="{{ asset('assets/img/logo.jpeg') }}" class="img-responsive logo"></a>
             </div>
             <div class="container-fluid">
                 <div class="navbar-btn">

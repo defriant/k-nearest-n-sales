@@ -59,7 +59,7 @@
 						<div class="overlay"></div>
 						<div class="content text">
 							<h1 class="heading">Penerapan Metode KNN</h1>
-							<p>Toko ...</p>
+							<p>Toko Raffa Collection</p>
 						</div>
 					</div>
 					<div class="clearfix"></div>

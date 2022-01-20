@@ -4,77 +4,83 @@ $.ajaxSetup({
     }
 })
 
-if (location.pathname == '/dashboard') {
-    chartPendapatan()
-}else if(location.pathname == '/kelola-data-penjualan'){
-    dataPenjualan()
-}
+class requestData {
+    post(params){
+        let url = params.url
+        let data = params.data
 
-function chartPendapatan() {
-    let mychart
-    $.ajax({
-        type:'get',
-        url:'/data-pendapatan',
-        success:function(response){
-            console.log(response)
-            let ctx = document.getElementById("data-penjualan-chart").getContext('2d')
-            mychart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-                    datasets: [
-                        {
-                            label: 'Pendapatan',
-                            data: response.pendapatan,
-                            borderColor: mainColor,
-                            backgroundColor: mainColor
-                        }
-                    ]
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'POST',
+                url: url,
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success:function(result){
+                    resolve(result)
                 },
-                options: {
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
+                error:function(result){
+                    alert('Oops! Something went wrong ..')
                 }
-            });
-        }
-    })
+            })
+        })
+    }
 
-    
-    $('.change-periode').on('click', function(){
-        $('.change-periode').removeClass('active')
-        $(this).addClass('active')
-        let periode = $(this).data('periode')
-        updateChartPendapatan(mychart, periode)
-    })
+    get(params){
+        let url = params.url
+
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: "json",
+                contentType: 'application/json',
+                success:function(result){
+                    resolve(result)
+                },
+                error:function(result){
+                    alert('Oops! Something went wrong ..')
+                }
+            })
+        })
+    }
 }
 
-function updateChartPendapatan(mychart, periode) {
-    $.ajax({
-        type:'get',
-        url:'/data-pendapatan?tahun='+periode,
-        success:function(response){
-            $('#terjual').html(response.terjual)
-            $('#totalPendapatan').html(response.totalPendapatan)
-            mychart.data = {
-                labels: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-                datasets: [
-                    {
-                        label: 'Pendapatan',
-                        data: response.pendapatan,
-                        borderColor: mainColor,
-                        backgroundColor: mainColor
-                    }
-                ]
-            }
-            mychart.update()
-        }
-    })
-}
+const ajaxRequest = new requestData()
 
-$('.periodePicker').datepicker({
+
+$('.date-picker').datetimepicker({
+    timepicker: false,
+    format: 'Y-m-d'
+})
+
+$('.date-picker.today').datetimepicker({
+    timepicker: false,
+    minDate: 'today',
+    format: 'Y-m-d'
+})
+
+$('.time-picker').datetimepicker({
+    datepicker: false,
+    timepicker: true,
+    format: 'H:i'
+})
+
+$('.input-number').on('keypress', function(e){
+    let charCode = (e.which) ? e.which : e.keyCode;
+    if(charCode > 31 && (charCode < 48 || charCode > 57)){
+        return false;
+    }
+    return true;
+})
+
+// if (location.pathname == '/dashboard') {
+//     chartPendapatan()
+// }else if(location.pathname == '/kelola-data-penjualan'){
+//     dataPenjualan()
+// }
+
+$('.month-picker').datepicker({
     changeMonth: true,
     changeYear: true,
     showButtonPanel: true,
@@ -115,94 +121,94 @@ function dataPenjualan() {
     })
 }
 
-$('#btn-input-data').on('click', function () {
-    if ($('#stokAwal').val().length == 0) {
-        alert('Masukkan Stok Awal')
-    } else if ($('#stokAkhir').val().length == 0) {
-        alert('Masukan Stok Akhir')
-    } else if ($('#terjual').val().length == 0) {
-        alert('Masukan Barang Terjual')
-    } else if ($('#pendapatan').val().length == 0) {
-        alert('Masukan Pendapatan')
-    } else {
-        $('#btn-input-data').attr('disabled', 'disabled')
-        $.ajax({
-            type: 'post',
-            url: '/input-data-penjualan',
-            data: {
-                monthYear: $('#monthYear').val(),
-                stokAwal: $('#stokAwal').val(),
-                stokAkhir: $('#stokAkhir').val(),
-                terjual: $('#terjual').val(),
-                pendapatan: $('#pendapatan').val()
-            },
-            success: function (response) {
-                if (response.response == 'success') {
-                    $('#monthYear').removeClass('periodePicker')
-                    $('#monthYear').val(response.lastPeriod)
-                    $('#stokAwal').val('')
-                    $('#stokAkhir').val('')
-                    $('#terjual').val('')
-                    $('#pendapatan').val('')
-                    toastr.option = {
-                        "timeout": "5000"
-                    }
-                    toastr["success"]("Data penjualan bulan " + response.monthYear + " berhasil diinput")
-                    $('#btn-input-data').removeAttr('disabled')
-                    $('#modalInput').modal('toggle')
-                    $('#table-penjualan').DataTable().ajax.reload()
-                } else if (response.response == 'failed') {
-                    toastr.option = {
-                        "timeout": "5000"
-                    }
-                    toastr["error"]("Data penjualan bulan " + response.monthYear + " sudah terdata, <br> Gagal menginput data")
-                    $('#btn-input-data').removeAttr('disabled')
-                }
-            }
-        })
-    }
-})
+// $('#btn-input-data').on('click', function () {
+//     if ($('#stokAwal').val().length == 0) {
+//         alert('Masukkan Stok Awal')
+//     } else if ($('#stokAkhir').val().length == 0) {
+//         alert('Masukan Stok Akhir')
+//     } else if ($('#terjual').val().length == 0) {
+//         alert('Masukan Barang Terjual')
+//     } else if ($('#pendapatan').val().length == 0) {
+//         alert('Masukan Pendapatan')
+//     } else {
+//         $('#btn-input-data').attr('disabled', 'disabled')
+//         $.ajax({
+//             type: 'post',
+//             url: '/input-data-penjualan',
+//             data: {
+//                 monthYear: $('#monthYear').val(),
+//                 stokAwal: $('#stokAwal').val(),
+//                 stokAkhir: $('#stokAkhir').val(),
+//                 terjual: $('#terjual').val(),
+//                 pendapatan: $('#pendapatan').val()
+//             },
+//             success: function (response) {
+//                 if (response.response == 'success') {
+//                     $('#monthYear').removeClass('periodePicker')
+//                     $('#monthYear').val(response.lastPeriod)
+//                     $('#stokAwal').val('')
+//                     $('#stokAkhir').val('')
+//                     $('#terjual').val('')
+//                     $('#pendapatan').val('')
+//                     toastr.option = {
+//                         "timeout": "5000"
+//                     }
+//                     toastr["success"]("Data penjualan bulan " + response.monthYear + " berhasil diinput")
+//                     $('#btn-input-data').removeAttr('disabled')
+//                     $('#modalInput').modal('toggle')
+//                     $('#table-penjualan').DataTable().ajax.reload()
+//                 } else if (response.response == 'failed') {
+//                     toastr.option = {
+//                         "timeout": "5000"
+//                     }
+//                     toastr["error"]("Data penjualan bulan " + response.monthYear + " sudah terdata, <br> Gagal menginput data")
+//                     $('#btn-input-data').removeAttr('disabled')
+//                 }
+//             }
+//         })
+//     }
+// })
 
-$('#btn-edit-data').on('click', function(){
-    if ($('#editStokAwal').val().length == 0) {
-        alert('Masukkan Stok Awal')
-    } else if ($('#editStokAkhir').val().length == 0) {
-        alert('Masukan Stok Akhir')
-    } else if ($('#editTerjual').val().length == 0) {
-        alert('Masukan Barang Terjual')
-    } else if ($('#editPendapatan').val().length == 0) {
-        alert('Masukan Pendapatan')
-    } else {
-        $('#btn-edit-data').attr('disabled', 'disabled')
-        $.ajax({
-            type: 'post',
-            url: '/edit-data-penjualan',
-            data: {
-                id: $('#editId').val(),
-                stokAwal: $('#editStokAwal').val(),
-                stokAkhir: $('#editStokAkhir').val(),
-                terjual: $('#editTerjual').val(),
-                pendapatan: $('#editPendapatan').val()
-            },
-            success: function (response) {
-                if (response == "success") {
-                    toastr.option = {
-                        "timeout": "5000"
-                    }
-                    toastr["success"]("Data penjualan bulan " + $('#editMonthYear').val() + " berhasil di edit")
-                    $('#btn-edit-data').removeAttr('disabled')
-                    $('#modalEditData').modal('toggle')
-                    $('#table-penjualan').DataTable().ajax.reload()
-                }else{
-                    toastr.option = {
-                        "timeout": "5000"
-                    }
-                    toastr["error"]("Gagal merubah data penjualan periode " + $('#editMonthYear').val())
-                }
-            }
-        })
-    }
-})
+// $('#btn-edit-data').on('click', function(){
+//     if ($('#editStokAwal').val().length == 0) {
+//         alert('Masukkan Stok Awal')
+//     } else if ($('#editStokAkhir').val().length == 0) {
+//         alert('Masukan Stok Akhir')
+//     } else if ($('#editTerjual').val().length == 0) {
+//         alert('Masukan Barang Terjual')
+//     } else if ($('#editPendapatan').val().length == 0) {
+//         alert('Masukan Pendapatan')
+//     } else {
+//         $('#btn-edit-data').attr('disabled', 'disabled')
+//         $.ajax({
+//             type: 'post',
+//             url: '/edit-data-penjualan',
+//             data: {
+//                 id: $('#editId').val(),
+//                 stokAwal: $('#editStokAwal').val(),
+//                 stokAkhir: $('#editStokAkhir').val(),
+//                 terjual: $('#editTerjual').val(),
+//                 pendapatan: $('#editPendapatan').val()
+//             },
+//             success: function (response) {
+//                 if (response == "success") {
+//                     toastr.option = {
+//                         "timeout": "5000"
+//                     }
+//                     toastr["success"]("Data penjualan bulan " + $('#editMonthYear').val() + " berhasil di edit")
+//                     $('#btn-edit-data').removeAttr('disabled')
+//                     $('#modalEditData').modal('toggle')
+//                     $('#table-penjualan').DataTable().ajax.reload()
+//                 }else{
+//                     toastr.option = {
+//                         "timeout": "5000"
+//                     }
+//                     toastr["error"]("Gagal merubah data penjualan periode " + $('#editMonthYear').val())
+//                 }
+//             }
+//         })
+//     }
+// })
 
 $('#btn-prediksi-data').on('click', function () {
     if ($('#terjual').val().length == 0) {

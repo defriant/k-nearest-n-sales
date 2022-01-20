@@ -27,6 +27,23 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [WebController::class, 'dashboard']);
     Route::get('/data-pendapatan', [WebController::class, 'data_pendapatan']);
 
+    Route::get('/master-produk', function () {
+        return view('master-produk');
+    });
+    Route::get('/master-produk/get', [WebController::class, 'get_produk']);
+    Route::post('/master-produk/input', [WebController::class, 'input_produk']);
+    Route::post('/master-produk/update', [WebController::class, 'update_produk']);
+    Route::post('/master-produk/delete', [WebController::class, 'delete_produk']);
+
+    Route::get('/transaksi', [WebController::class, 'transaksi']);
+    Route::post('/transaksi/get', [WebController::class, 'get_transaksi']);
+    Route::post('/transaksi/input', [WebController::class, 'input_transaksi']);
+
+    Route::get('/transaksi-perbulan', function () {
+        return view('transaksi-perbulan');
+    });
+    Route::post('/transaksi-perbulan/get', [WebController::class, 'get_transaksi_perbulan']);
+
     Route::get('/kelola-data-penjualan', [WebController::class, 'kelola_data_penjualan']);
     Route::get('/data-penjualan', [WebController::class, 'data_penjualan']);
 

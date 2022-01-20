@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="{{ asset('assets/font-awesome-pro-master/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/jquery/jquery-ui.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/vendor/toastr/toastr.min.css') }}">
+    {{-- Datatime picker --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/jquery.datetimepicker.min.css') }}">
     <!-- Env Color -->
     <link rel="stylesheet" href="{{ asset('assets/css/envColor.css') }}">
     <script src="{{ asset('assets/scripts/envColor.js') }}"></script>
@@ -36,7 +38,7 @@
     <div id="wrapper">
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="brand">
-                <a href="/"><img src="{{ asset('assets/img/logo.jpeg') }}" class="img-responsive logo"></a>
+                <a href="/dashboard"><img src="{{ asset('assets/img/logo.jpeg') }}" class="img-responsive logo"></a>
             </div>
             <div class="container-fluid">
                 <div class="navbar-btn">
@@ -65,8 +67,17 @@
                             <a href="/dashboard" class="{{ Request::is('dashboard') ? 'active' : '' }}"><i class="lnr lnr-home"></i> <span>Dashboard</span></a>
                         </li>
                         <li>
-                            <a href="/kelola-data-penjualan" class="{{ Request::is('kelola-data-penjualan') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Kelola Data Penjualan</span></a>
+                            <a href="/master-produk" class="{{ Request::is('master-produk') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Master Produk</span></a>
                         </li>
+                        <li>
+                            <a href="/transaksi" class="{{ Request::is('transaksi') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Transaksi</span></a>
+                        </li>
+                        <li>
+                            <a href="/transaksi-perbulan" class="{{ Request::is('transaksi-perbulan') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Transaksi Perbulan</span></a>
+                        </li>
+                        {{-- <li>
+                            <a href="/kelola-data-penjualan" class="{{ Request::is('kelola-data-penjualan') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Kelola Data Penjualan</span></a>
+                        </li> --}}
                         <li>
                             <a href="/prediksi-penjualan" class="{{ Request::is('prediksi-penjualan') ? 'active' : '' }}"><i class="fal fa-chart-line"></i> <span>Prediksi Penjualan (KNN)</span></a>
                         </li>
@@ -97,9 +108,19 @@
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <script src="{{ asset('assets/scripts/jquery.datetimepicker.full.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/toastr/toastr.min.js') }}"></script>
     <script src="{{ asset('assets/scripts/klorofil-common.js') }}"></script>
     <script src="{{ asset('assets/scripts/main.js') }}"></script>
+    @if (Request::is('dashboard'))
+        <script src="{{ asset('assets/scripts/dashboard.js') }}"></script>
+    @elseif (Request::is('master-produk'))
+        <script src="{{ asset('assets/scripts/master-produk.js') }}"></script>
+    @elseif (Request::is('transaksi'))
+        <script src="{{ asset('assets/scripts/transaksi.js') }}"></script>
+    @elseif (Request::is('transaksi-perbulan'))
+        <script src="{{ asset('assets/scripts/transaksi-perbulan.js') }}"></script>
+    @endif
     @yield('scripts')
 </body>
 

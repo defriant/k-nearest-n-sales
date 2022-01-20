@@ -2,13 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Penjualan;
+use App\Models\TotalPerbulan;
+use App\Models\Produk;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class WebController extends Controller
 {
+    function random($type, $length)
+    {
+        $result = "";
+        if ($type == 'char') {
+            $char = 'ABCDEFGHJKLMNPRTUVWXYZ';
+            $max        = strlen($char) - 1;
+            for ($i = 0; $i < $length; $i++) {
+                $rand = mt_rand(0, $max);
+                $result .= $char[$rand];
+            }
+            return $result;
+        } elseif ($type == 'num') {
+            $char = '123456789';
+            $max        = strlen($char) - 1;
+            for ($i = 0; $i < $length; $i++) {
+                $rand = mt_rand(0, $max);
+                $result .= $char[$rand];
+            }
+            return $result;
+        } elseif ($type == 'mix') {
+            $char = 'A1B2C3D4E5F6G7H8J9KLMNPRTUVWXYZ';
+            $max = strlen($char) - 1;
+            for ($i = 0; $i < $length; $i++) {
+                $rand = mt_rand(0, $max);
+                $result .= $char[$rand];
+            }
+            return $result;
+        }
+    }
+
     public function login_attempt(Request $request)
     {
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
@@ -27,7 +59,7 @@ class WebController extends Controller
 
     public function dashboard()
     {
-        $dataPenjualan = Penjualan::orderBy('periode')->get();
+        $dataPenjualan = TotalPerbulan::orderBy('periode')->get();
         $periode = [];
         foreach ($dataPenjualan as $dp) {
             $periodeDp = date('Y', strtotime($dp->periode));
@@ -37,8 +69,8 @@ class WebController extends Controller
             }
         }
 
-        $pendapatan = Penjualan::whereYear('periode', end($periode))->sum('pendapatan');
-        $terjual = Penjualan::whereYear('periode', end($periode))->sum('terjual');
+        $pendapatan = TotalPerbulan::whereYear('periode', end($periode))->sum('pendapatan');
+        $terjual = TotalPerbulan::whereYear('periode', end($periode))->sum('terjual');
 
         return view('dashboard', compact('periode', 'pendapatan', 'terjual'));
     }
@@ -46,16 +78,16 @@ class WebController extends Controller
     public function data_pendapatan(Request $request)
     {
         if ($request->tahun == null) {
-            $periode = Penjualan::orderBy('periode', 'DESC')->first();
+            $periode = TotalPerbulan::orderBy('periode', 'DESC')->first();
             $periode = date('Y', strtotime($periode->periode));
-            $penjualan = Penjualan::whereYear('periode', $periode)->get();
+            $penjualan = TotalPerbulan::whereYear('periode', $periode)->get();
             $pendapatan = [];
             foreach ($penjualan as $p) {
                 $pendapatan[] = $p->pendapatan;
             }
 
-            $totalPendapatan = Penjualan::whereYear('periode', $periode)->sum('pendapatan');
-            $terjual = Penjualan::whereYear('periode', $periode)->sum('terjual');
+            $totalPendapatan = TotalPerbulan::whereYear('periode', $periode)->sum('pendapatan');
+            $terjual = TotalPerbulan::whereYear('periode', $periode)->sum('terjual');
 
             $response = [
                 "pendapatan" => $pendapatan,
@@ -66,14 +98,14 @@ class WebController extends Controller
             return response()->json($response);
         } else {
             $periode = $request->tahun;
-            $penjualan = Penjualan::whereYear('periode', $periode)->get();
+            $penjualan = TotalPerbulan::whereYear('periode', $periode)->get();
             $pendapatan = [];
             foreach ($penjualan as $p) {
                 $pendapatan[] = $p->pendapatan;
             }
 
-            $totalPendapatan = Penjualan::whereYear('periode', $periode)->sum('pendapatan');
-            $terjual = Penjualan::whereYear('periode', $periode)->sum('terjual');
+            $totalPendapatan = TotalPerbulan::whereYear('periode', $periode)->sum('pendapatan');
+            $terjual = TotalPerbulan::whereYear('periode', $periode)->sum('terjual');
 
             $response = [
                 "pendapatan" => $pendapatan,
@@ -83,6 +115,180 @@ class WebController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function get_produk()
+    {
+        $data = Produk::all();
+
+        foreach ($data as $d) {
+            $d["harga"] = "Rp. " . number_format($d->harga);
+        }
+
+        $response = [
+            "data" => $data
+        ];
+
+        return response()->json($response);
+    }
+
+    public function input_produk(Request $request)
+    {
+        $produk = Produk::all();
+        $produk_count = count($produk) + 1;
+
+        while (true) {
+            $id = "RF" . $produk_count;
+            $cek = Produk::where('id', $id)->first();
+            if ($cek) {
+                $produk_count = $produk_count + 1;
+            } else {
+                break;
+            }
+        }
+
+        Produk::create([
+            'id' => $id,
+            'nama' => $request->nama,
+            'harga' => $request->harga
+        ]);
+
+        $response = [
+            "response" => "success",
+            "message" => "Berhasil menambahkan data produk"
+        ];
+        return response()->json($response);
+    }
+
+    public function update_produk(Request $request)
+    {
+        Produk::where('id', $request->id)->update([
+            "nama" => $request->nama,
+            "harga" => $request->harga
+        ]);
+
+        $response = [
+            "response" => "success",
+            "message" => "Produk " . $request->id . " berhasil di update"
+        ];
+        return response()->json($response);
+    }
+
+    public function delete_produk(Request $request)
+    {
+        $data = Produk::where('id', $request->id)->first();
+        Produk::where('id', $request->id)->delete();
+
+        $response = [
+            "response" => "success",
+            "message" => $data->nama . " berhasil di hapus"
+        ];
+
+        return response()->json($response);
+    }
+
+    public function transaksi()
+    {
+        $produk = Produk::all();
+        return view('transaksi', compact('produk'));
+    }
+
+    public function get_transaksi(Request $request)
+    {
+        $transaksi = Transaksi::where('tanggal', $request->tanggal)->get();
+        $response = [
+            "response" => "success",
+            "data" => $transaksi
+        ];
+
+        return response()->json($response);
+    }
+
+    public function input_transaksi(Request $request)
+    {
+        $produk = Produk::find($request->id_produk);
+        $cek = Transaksi::where('tanggal', $request->tanggal)->where('id_produk', $request->id_produk)->first();
+        if ($cek) {
+            Transaksi::where('id', $cek->id)->update([
+                "harga" => $produk->harga,
+                "terjual" => $cek->terjual + $request->terjual,
+                "total_harga" => $cek->total_harga + ($produk->harga * $request->terjual)
+            ]);
+        } else {
+            Transaksi::create([
+                "tanggal" => $request->tanggal,
+                "id_produk" => $request->id_produk,
+                "produk" => $produk->nama,
+                "harga" => $produk->harga,
+                "terjual" => $request->terjual,
+                "total_harga" => $produk->harga * $request->terjual
+            ]);
+        }
+
+        $month = date('m', strtotime($request->tanggal));
+        $year = date('Y', strtotime($request->tanggal));
+        $cek = TotalPerbulan::whereMonth('periode', $month)->whereYear('periode', $year)->first();
+        if ($cek) {
+            TotalPerbulan::where('id', $cek->id)->update([
+                "terjual" => $cek->terjual + $request->terjual,
+                "pendapatan" => $cek->pendapatan + ($produk->harga * $request->terjual)
+            ]);
+        } else {
+            TotalPerbulan::create([
+                "periode" => $year . "-" . $month . "-01",
+                "terjual" => $request->terjual,
+                "pendapatan" => $produk->harga * $request->terjual
+            ]);
+        }
+
+        $response = [
+            "response" => "success",
+            "message" => "Berhasil input transaksi"
+        ];
+
+        return response()->json($response);
+    }
+
+    public function get_transaksi_perbulan(Request $request)
+    {
+        $year = date('Y', strtotime($request->periode));
+        $month = date('m', strtotime($request->periode));
+
+        $produk = Produk::all();
+        $data = [];
+
+        foreach ($produk as $prod) {
+            $periode = Transaksi::where('id_produk', $prod->id)->whereMonth('tanggal', $month)->whereYear('tanggal', $year)->get();
+            $terjual = 0;
+            $pendapatan = 0;
+            foreach ($periode as $period) {
+                $terjual = $terjual + $period->terjual;
+                $pendapatan = $pendapatan + $period->total_harga;
+            }
+
+            $data[] = [
+                "periode" => $request->periode,
+                "produk" => $prod->nama,
+                "terjual" => $terjual,
+                "pendapatan" => $pendapatan
+            ];
+        }
+
+        $totalPerbulan = TotalPerbulan::whereMonth('periode', $month)->whereYear('periode', $year)->first();
+        $total_terjual = 0;
+        $total_pendapatan = 0;
+        if ($totalPerbulan) {
+            $total_terjual = $totalPerbulan->terjual;
+            $total_pendapatan = $totalPerbulan->pendapatan;
+        }
+
+        $response = [
+            "response" => "success",
+            "data" => $data,
+            "total_terjual" => $total_terjual,
+            "total_pendapatan" => $total_pendapatan
+        ];
+        return response()->json($response);
     }
 
     public function kelola_data_penjualan()
@@ -163,7 +369,7 @@ class WebController extends Controller
 
     public function prediksi()
     {
-        $dataPenjualanTerakhir = Penjualan::orderBy('periode', 'DESC')->first();
+        $dataPenjualanTerakhir = TotalPerbulan::orderBy('periode', 'DESC')->first();
         $prediksiPeriode = [];
         for ($i = 1; $i <= 5; $i++) {
             $prediksiPeriode[] = date('F Y', strtotime('+ ' . $i . ' months', strtotime($dataPenjualanTerakhir->periode)));
@@ -174,7 +380,7 @@ class WebController extends Controller
 
     public function knn(Request $request)
     {
-        $dataPenjualan = Penjualan::all();
+        $dataPenjualan = TotalPerbulan::all();
         $avg = ($dataPenjualan->sum('pendapatan') + $dataPenjualan->sum('terjual')) / count($dataPenjualan);
         $avg = number_format((float)$avg, 0, '.', '');
 
@@ -263,4 +469,61 @@ class WebController extends Controller
 
         return response()->json($response);
     }
+
+    // public function generate_total_perbulan()
+    // {
+    //     $transaksi = Transaksi::all();
+    //     $periode = [];
+    //     $data = [];
+
+    //     foreach ($transaksi as $t) {
+    //         $t_periode = date('Y-m', strtotime($t->tanggal));
+    //         $t_periode = $t_periode . "-01";
+    //         $cek = array_search($t_periode, $periode);
+    //         if ($cek === false) {
+    //             $periode[] = $t_periode;
+    //         }
+    //     }
+
+    //     foreach ($periode as $period) {
+    //         $month = date('m', strtotime($period));
+    //         $year = date('Y', strtotime($period));
+
+    //         $data[] = [
+    //             "periode" => $period,
+    //             "terjual" => Transaksi::whereMonth('tanggal', $month)->whereYear('tanggal', $year)->sum('terjual'),
+    //             "pendapatan" => Transaksi::whereMonth('tanggal', $month)->whereYear('tanggal', $year)->sum('total_harga')
+    //         ];
+    //     }
+
+    //     foreach ($data as $d) {
+    //         TotalPerbulan::create([
+    //             "periode" => $d["periode"],
+    //             "terjual" => $d["terjual"],
+    //             "pendapatan" => $d["pendapatan"]
+    //         ]);
+    //     }
+    // }
+
+    // public function cek()
+    // {
+    //     // $transaksi = Transaksi::where('terjual', 0)->where('total_harga', 0)->get();
+    //     // $transaksi = count($transaksi);
+
+    //     // $transaksi = Transaksi::where('terjual', '>', 0)->where('total_harga', 0)->get();
+    //     // $transaksi = count($transaksi);
+
+    //     // $transaksi = Transaksi::where('terjual', 0)->where('total_harga', '>', 0)->get();
+    //     // $transaksi = count($transaksi);
+
+    //     // $transaksi = Transaksi::all();
+    //     // foreach ($transaksi as $t) {
+    //     //     Transaksi::where('id', $t->id)->update([
+    //     //         "created_at" => date('Y-m-d H:i:s'),
+    //     //         "updated_at" => date('Y-m-d H:i:s')
+    //     //     ]);
+    //     // }
+
+    //     // dd($transaksi);
+    // }
 }

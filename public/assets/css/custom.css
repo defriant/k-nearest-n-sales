@@ -81,3 +81,20 @@
 .btn-table-action.edit {
     background: #ffaa00;
 }
+
+.btn-table-action.delete {
+    background: #c91d1d;
+}
+
+.btn-table-action[disabled="disabled"] {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+.date-picker {
+    background-color: transparent !important;
+}
+
+.month-picker {
+    background-color: transparent !important;
+}

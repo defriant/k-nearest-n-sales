@@ -227,7 +227,7 @@ $('#btn-prediksi-data').on('click', function () {
         $('#hasil-prediksi').append(`<div class="panel panel-headline" id="panel-prediksi-loading">
                                         <div class="loader">
                                             <div class="loader4"></div>
-                                            <h5 style="margin-top: 2.5rem">Membuat data prediksi</h5>
+                                            <h5 style="margin-top: 2.5rem">Membuat data klasifikasi</h5>
                                         </div>
                                     </div>`)
         $('#hasil-prediksi').append(`<div class="panel panel-headline" id="panel-head-prediksi" style="display: none;"></div>`)
@@ -246,7 +246,7 @@ function knn(data) {
             console.log(response);
             $('#panel-head-prediksi').empty()
             $('#panel-head-prediksi').append(`<div class="panel-heading">
-                                                <h3 class="panel-title">Prediksi Klasifikasi Penjualan</h3>
+                                                <h3 class="panel-title">Klasifikasi Penjualan</h3>
                                             </div>
                                             <div class="panel-body" id="panel-body-prediksi-terjual">
                                                 <p>Data Penjualan :</p>
@@ -289,7 +289,7 @@ function knn(data) {
                                                     </div>
                                                 </div>
                                                 <hr>
-                                                <p>Hasil Prediksi :</p>
+                                                <p>Hasil Klasifikasi :</p>
                                                 <div class="row">
                                                     <div class="col-md-12">
                                                         <table class="table table-striped">
@@ -299,7 +299,7 @@ function knn(data) {
                                                                     <th>Produk Terjual</th>
                                                                     <th>Pendapatan</th>
                                                                     <th></th>
-                                                                    <th>Prediksi Klasifikasi</th>
+                                                                    <th>Klasifikasi</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody id="data-hasil">

@@ -70,16 +70,16 @@
                             <a href="/master-produk" class="{{ Request::is('master-produk') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Master Produk</span></a>
                         </li>
                         <li>
-                            <a href="/transaksi" class="{{ Request::is('transaksi') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Transaksi</span></a>
+                            <a href="/transaksi" class="{{ Request::is('transaksi') ? 'active' : '' }}"><i class="fal fa-cash-register"></i> <span>Transaksi</span></a>
                         </li>
                         <li>
-                            <a href="/transaksi-perbulan" class="{{ Request::is('transaksi-perbulan') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Transaksi Perbulan</span></a>
+                            <a href="/transaksi-perbulan" class="{{ Request::is('transaksi-perbulan') ? 'active' : '' }}"><i class="fal fa-sack-dollar"></i> <span>Transaksi Perbulan</span></a>
                         </li>
                         {{-- <li>
                             <a href="/kelola-data-penjualan" class="{{ Request::is('kelola-data-penjualan') ? 'active' : '' }}"><i class="fal fa-tasks"></i> <span>Kelola Data Penjualan</span></a>
                         </li> --}}
                         <li>
-                            <a href="/prediksi-penjualan" class="{{ Request::is('prediksi-penjualan') ? 'active' : '' }}"><i class="fal fa-chart-line"></i> <span>Prediksi Penjualan (KNN)</span></a>
+                            <a href="/prediksi-penjualan" class="{{ Request::is('prediksi-penjualan') ? 'active' : '' }}"><i class="fal fa-chart-line"></i> <span>Klasifikasi Penjualan</span></a>
                         </li>
                     </ul>
                 </nav>

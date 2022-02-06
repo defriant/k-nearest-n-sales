@@ -4,7 +4,7 @@
     <div class="col-md-6">
         <div class="panel panel-headline">
             <div class="panel-heading">
-                <h3 class="panel-title">Prediksi Penjualan</h3>
+                <h3 class="panel-title">Klasifikasi Penjualan</h3>
             </div>
             <div class="panel-body">
                 <p>Periode</p>
@@ -35,7 +35,7 @@
             <div class="panel-footer">
                 <div class="row">
                     <div class="text-right"><button id="btn-prediksi-data" class="btn btn-primary">Mulai
-                            Prediksi</button></div>
+                            Klasifikasi</button></div>
                 </div>
             </div>
         </div>

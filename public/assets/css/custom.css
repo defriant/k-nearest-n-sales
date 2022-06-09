@@ -98,3 +98,39 @@
 .month-picker {
     background-color: transparent !important;
 }
+
+#btn-print-hasil {
+    padding: 0.3rem 1rem;
+    border: 1px solid #9da0a0;
+    border-radius: 4px;
+    opacity: .7;
+    transition: .3s;
+    display: none;
+}
+
+#btn-print-hasil:hover {
+    opacity: 1;
+}
+
+#print-title {
+    display: none;
+}
+
+@media print {
+    .main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    .hide-on-print {
+        display: none !important;
+    }
+
+    #print-title {
+        display: block;
+    }
+}

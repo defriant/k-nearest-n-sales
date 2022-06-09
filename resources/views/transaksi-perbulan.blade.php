@@ -5,13 +5,14 @@
         <!-- RECENT PURCHASES -->
         <div class="panel panel-headline">
             <div class="panel-heading">
-                <h3 class="panel-title">Laporan Transaksi Perbulan</h3>
-                {{-- <div class="right">
-                    <button type="button" data-toggle="modal" data-target="#modalInput"><i class="far fa-plus"></i>&nbsp; Input Transaksi</button>
-                </div> --}}
+                <h3 class="panel-title no-print">Laporan Transaksi Perbulan</h3>
+                <h3 class="panel-title" id="print-title"></h3>
+                <div class="right hide-on-print">
+                    <button type="button" id="btn-print-hasil"><i class="far fa-print"></i>&nbsp; Print</button>
+                </div>
             </div>
             <div class="panel-body">
-                <div class="row">
+                <div class="row no-print">
                     <div class="col-md-4">
                         <p>Periode transaksi</p>
                         <div class="input-group">
@@ -20,7 +21,7 @@
                         </div>
                     </div>
                 </div>
-                <br><br>
+                <br class="no-print"><br class="no-print">
                 <div id="data-transaksi">
                     <div class="loader">
                         <i class="fas fa-ban" style="font-size: 5rem; opacity: .5"></i>

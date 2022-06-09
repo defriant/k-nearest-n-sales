@@ -9,6 +9,8 @@ $('#search-transaksi').on('click', function(){
                 "periode": $('#periode-transaksi').val()
             }
         }).then(function(result){
+            $('#btn-print-hasil').show()
+            $('#print-title').html(`Laporan transaksi`)
             if (result.response == "success") {
                 $('#data-transaksi').html(`<br>
                                             <table class="table">
@@ -50,4 +52,12 @@ $('#search-transaksi').on('click', function(){
             }
         })
     }
+})
+
+$('#btn-print-hasil').on('click', function () {
+    $('body').addClass('layout-fullwidth')
+    window.print()
+    setTimeout(() => {
+        $('body').removeClass('layout-fullwidth')
+    }, 1);
 })

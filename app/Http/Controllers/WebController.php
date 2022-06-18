@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\TotalPerbulan;
 use App\Models\Produk;
+use App\Models\T_Produk;
 use App\Models\Transaksi;
+use App\Models\TransaksiV2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -195,7 +197,7 @@ class WebController extends Controller
 
     public function get_transaksi(Request $request)
     {
-        $transaksi = Transaksi::where('tanggal', $request->tanggal)->get();
+        $transaksi = TransaksiV2::where('tanggal', $request->tanggal)->orderBy('created_at')->get();
         $response = [
             "response" => "success",
             "data" => $transaksi
@@ -204,40 +206,83 @@ class WebController extends Controller
         return response()->json($response);
     }
 
+    public function detail_transaksi(Request $request)
+    {
+        $transaksi = TransaksiV2::find($request->id);
+        $tproduk = [];
+
+        foreach ($transaksi->produk as $tp) {
+            $tproduk[] = [
+                "produk" => $tp->produk->nama,
+                "harga" => number_format($tp->harga),
+                "jumlah" => $tp->terjual,
+                "total" => number_format($tp->total)
+            ];
+        }
+
+        $data = [
+            "invoice" => $transaksi->id,
+            "tanggal" => date('d F Y', strtotime($transaksi->tanggal)),
+            "waktu" => date('H:i', strtotime($transaksi->created_at)),
+            "produk" => $tproduk,
+            "total" => "Rp " . number_format($transaksi->total)
+        ];
+
+        return response()->json($data);
+    }
+
     public function input_transaksi(Request $request)
     {
-        $produk = Produk::find($request->id_produk);
-        $cek = Transaksi::where('tanggal', $request->tanggal)->where('id_produk', $request->id_produk)->first();
-        if ($cek) {
-            Transaksi::where('id', $cek->id)->update([
+        $id_transaksi = "T" . $this->random('num', 6);
+        while (true) {
+            $check = TransaksiV2::where('id', $id_transaksi)->first();
+            if ($check) {
+                $id_transaksi = "T" . $this->random('num', 9);
+            } else {
+                break;
+            }
+        }
+
+        $terjual = 0;
+        $total = 0;
+
+        foreach ($request->produk as $p) {
+            $produk = Produk::find($p["produk"]);
+            $terjual += $p["jumlah"];
+            $total += $produk->harga * $p["jumlah"];
+            T_Produk::create([
+                "id_transaksi" => $id_transaksi,
+                "id_produk" => $p["produk"],
                 "harga" => $produk->harga,
-                "terjual" => $cek->terjual + $request->terjual,
-                "total_harga" => $cek->total_harga + ($produk->harga * $request->terjual)
-            ]);
-        } else {
-            Transaksi::create([
-                "tanggal" => $request->tanggal,
-                "id_produk" => $request->id_produk,
-                "produk" => $produk->nama,
-                "harga" => $produk->harga,
-                "terjual" => $request->terjual,
-                "total_harga" => $produk->harga * $request->terjual
+                "terjual" => $p["jumlah"],
+                "total" => $produk->harga * $p["jumlah"]
             ]);
         }
 
-        $month = date('m', strtotime($request->tanggal));
+        TransaksiV2::create([
+            "id" => $id_transaksi,
+            "tanggal" => $request->tanggal,
+            "terjual" => $terjual,
+            "total" => $total,
+        ]);
+
         $year = date('Y', strtotime($request->tanggal));
-        $cek = TotalPerbulan::whereMonth('periode', $month)->whereYear('periode', $year)->first();
-        if ($cek) {
-            TotalPerbulan::where('id', $cek->id)->update([
-                "terjual" => $cek->terjual + $request->terjual,
-                "pendapatan" => $cek->pendapatan + ($produk->harga * $request->terjual)
+        $month = date('m', strtotime($request->tanggal));
+
+        $monthly = TotalPerbulan::whereYear('periode', $year)->whereMonth('periode', $month)->first();
+        if ($monthly) {
+            $monthly->update([
+                "terjual" => $monthly->terjual + $terjual,
+                "pendapatan" => $monthly->pendapatan + $total
             ]);
         } else {
+            $periode = date('Y', strtotime($request->tanggal)) . '-' . date('m', strtotime($request->tanggal)) . '-' . '01';
+            $periode = date('Y-m-d', strtotime($periode));
+
             TotalPerbulan::create([
-                "periode" => $year . "-" . $month . "-01",
-                "terjual" => $request->terjual,
-                "pendapatan" => $produk->harga * $request->terjual
+                'periode' => $periode,
+                'terjual' => $terjual,
+                'pendapatan' => $total
             ]);
         }
 
@@ -258,12 +303,15 @@ class WebController extends Controller
         $data = [];
 
         foreach ($produk as $prod) {
-            $periode = Transaksi::where('id_produk', $prod->id)->whereMonth('tanggal', $month)->whereYear('tanggal', $year)->get();
+            // $periode = Transaksi::where('id_produk', $prod->id)->whereMonth('tanggal', $month)->whereYear('tanggal', $year)->get();
+            $periode = T_Produk::where('id_produk', $prod->id)->whereHas('transaksi', function ($q) use ($year, $month) {
+                $q->whereYear('tanggal', $year)->whereMonth('tanggal', $month);
+            })->get();
             $terjual = 0;
             $pendapatan = 0;
             foreach ($periode as $period) {
                 $terjual = $terjual + $period->terjual;
-                $pendapatan = $pendapatan + $period->total_harga;
+                $pendapatan = $pendapatan + $period->total;
             }
 
             $data[] = [

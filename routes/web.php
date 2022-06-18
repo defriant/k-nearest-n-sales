@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi', [WebController::class, 'transaksi']);
     Route::post('/transaksi/get', [WebController::class, 'get_transaksi']);
     Route::post('/transaksi/input', [WebController::class, 'input_transaksi']);
+    Route::post('/transaksi/detail', [WebController::class, 'detail_transaksi']);
 
     Route::get('/transaksi-perbulan', function () {
         return view('transaksi-perbulan');

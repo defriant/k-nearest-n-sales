@@ -33,7 +33,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalInput" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+{{-- <div class="modal fade" id="modalInput" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -71,46 +71,56 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
-<div class="modal fade" id="modalEditData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="modalInput" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Edit Produk</h4>
+                <h4 class="modal-title" id="myModalLabel">Input transaksi</h4>
             </div>
             <div class="modal-body">
-                <p>Kode Produk</p>
-                <input type="text" id="edit-id" class="form-control" readonly>
-                <br>
-                <p>Nama Produk</p>
-                <input type="text" id="edit-nama" class="form-control">
-                <br>
-                <p>Harga Produk</p>
-                <div class="input-group">
-                    <span class="input-group-addon">Rp.</span>
-                    <input class="form-control input-number" id="edit-harga" type="text">
+                <div id="transaksi-produk">
+                    <div class="row" style="margin-bottom: 2rem">
+                        <div class="col-md-7">
+                            <p>Produk</p>
+                            <select class="form-control input-produk" id="input-produk">
+                                <option value=""></option>
+                                @foreach ($produk as $p)
+                                    <option value="{{ $p->id }}">{{ $p->nama }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <p>Jumlah</p>
+                            <input type="number" class="form-control input-jumlah">
+                        </div>
+                        <div class="col-md-2">
+                            <p>&nbsp;</p>
+                        </div>
+                    </div>
                 </div>
+                <button class="transaksi-tambah-produk"><i class="fal fa-plus"></i> &nbsp; Tambah produk</button>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="btn-edit-data">Simpan</button>
+                <button type="button" class="btn btn-primary" id="btn-input-data">Input</button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="modalDeleteData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
+<div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-                <h4 class="text-center" style="margin-top: 3rem" id="delete-warning-message"></h4>
-                <input type="hidden" id="delete-id">
-                <div style="margin-top: 5rem; text-align: center">
-                    <button type="button" class="btn btn-danger" id="btn-delete-data">Hapus</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Batal</button>
-                </div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Detail transaksi</h4>
+            </div>
+            <div class="modal-body" id="modal-body-detail-transaksi">
+                
             </div>
         </div>
     </div>
